@@ -71,7 +71,21 @@ alphaEq(lambda(mvar(V), M), lambda(mvar(W), N)) :-
 	V \== W, fv(M, L), not(member(W, L)), sustFV(M, V, W, MSust),
 	alphaEq(MSust, N).
 
+%nonFV(+M, -Var)
+nonFV(M, N, Var) :- vari(Var), fv(M, L1), fv(N, L2),
+	not(member(Var, L1)), not(member(Var, L2)), !.
+
 %Ej 5: sust(+M, +X, +N, ?MSust)
+sust(mvar(V), V, N, N).
+sust(mvar(V), W, _, mvar(V)) :- V \== W.
+sust(app(M, N), V, O, app(MSust, NSust)) :-
+	sust(M, V, O, MSust), sust(N, V, O, NSust).
+sust(lambda(mvar(V), N), V, _, lambda(mvar(V), N)).
+sust(lambda(mvar(V), N), W, O, Res) :- W \== V,
+	nonFV(N, O, Fresca),
+	sust(N, Fresca, mvar(V), NSust),
+	MSust = lambda(mvar(Fresca), NSust),
+	sust(MSust, W, O, Res).
 
 %Ej 6A: betaRedex(+R, ?N)
 %Ej 6B: reduce(+M, ?N)
