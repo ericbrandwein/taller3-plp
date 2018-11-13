@@ -30,7 +30,7 @@ term(9, app(ConstX, OMEGA)) :- term(3, ConstX), term(8, OMEGA).
 
 %Ej 1A: vari(?X)
 vari(x).
-vari(X) :- X = ^(Y), vari(Y).
+vari(^(Y)) :- vari(Y).
 
 %Ej 1B: term(+M)
 term(mvar(V)) :- vari(V).
@@ -60,9 +60,7 @@ sustFV(lambda(V, N), Var1, Var2, lambda(V, NSust)) :-
 
 
 %Ej 4: alphaEq(+M, +N)
-alphaEq(M, _) :- not(term(M)), !, fail.
-alphaEq(_, N) :- not(term(N)), !, fail.
-alphaEq(mvar(V), mvar(W)) :- V = W.
+alphaEq(mvar(V), mvar(V)).
 alphaEq(app(M, N), app(O, P)) :- alphaEq(M, O), alphaEq(N, P).
 alphaEq(lambda(V, M), lambda(V, N)) :- alphaEq(M, N).
 alphaEq(lambda(V, M), lambda(W, N)) :-
@@ -81,7 +79,7 @@ sust(app(M, N), V, O, app(MSust, NSust)) :-
 sust(lambda(V, N), V, _, lambda(V, N)).
 sust(lambda(V, N), W, O, Res) :- W \== V,
 	nonFV(N, O, Fresca),
-	sust(N, Fresca, mvar(V), NSust),
+	sust(N, V, mvar(Fresca), NSust),
 	MSust = lambda(Fresca, NSust),
 	sust(MSust, W, O, Res).
 
