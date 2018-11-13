@@ -88,7 +88,14 @@ sust(lambda(mvar(V), N), W, O, Res) :- W \== V,
 	sust(MSust, W, O, Res).
 
 %Ej 6A: betaRedex(+R, ?N)
+betaRedex(app(lambda(mvar(V), M), N), Reduccion) :-
+	sust(M, V, N, Reduccion).
+
 %Ej 6B: reduce(+M, ?N)
+reduce(app(M, N), app(MRedu, N)) :- reduce(M, MRedu).
+reduce(app(M, N), app(M, NRedu)) :- reduce(N, NRedu).
+reduce(app(lambda(mvar(X), M), N), MSust) :- sust(M, X, N, MSust).
+reduce(lambda(mvar(V), M), lambda(mvar(V), MRedu)) :- reduce(M, MRedu).
 
 %Ej 7: formaNormal(+M)
 
