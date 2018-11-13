@@ -34,8 +34,8 @@ vari(X) :- X = ^(Y), vari(Y).
 
 %Ej 1B: term(+M)
 term(mvar(V)) :- vari(V).
-term(app(lambda(mvar(V), M), N)) :- vari(V), term(M), term(N).
-term(lambda(mvar(V), N)) :- vari(V), term(N).
+term(app(lambda(V, M), N)) :- vari(V), term(M), term(N).
+term(lambda(V, N)) :- vari(V), term(N).
 
 % No es posible definir term(-X), ya que unifica infinitamente
 % con los valores devueltos por la primer regla, que es la que
@@ -47,15 +47,15 @@ term(lambda(mvar(V), N)) :- vari(V), term(N).
 %Ej 2: fv(+M, -Xs)
 fv(mvar(V), [V]).
 fv(app(M, N), Lista) :- fv(M, L1), fv(N, L2), union(L1, L2, Lista).
-fv(lambda(V, N), Lista) :- fv(V, L1), fv(N, L2), subtract(L2, L1, Lista).
+fv(lambda(V, N), Lista) :- L1 = [V], fv(N, L2), subtract(L2, L1, Lista).
 
 %Ej 3: sustFV(+M, +X, +Y, ?MSust)
 sustFV(mvar(V), V, Var2, mvar(Var2)).
 sustFV(mvar(V), Var1, _, mvar(V)) :- V \= Var1.
 sustFV(app(O, N), Var1, Var2, app(OSust, NSust)) :-
 	sustFV(O, Var1, Var2, OSust), sustFV(N, Var1, Var2, NSust).
-sustFV(lambda(mvar(V), N), V, _, lambda(mvar(V), N)).
-sustFV(lambda(mvar(V), N), Var1, Var2, lambda(mvar(V), NSust)) :-
+sustFV(lambda(V, N), V, _, lambda(V, N)).
+sustFV(lambda(V, N), Var1, Var2, lambda(V, NSust)) :-
 	V \= Var1, sustFV(N, Var1, Var2, NSust).
 
 
@@ -64,8 +64,8 @@ alphaEq(M, _) :- not(term(M)), !, fail.
 alphaEq(_, N) :- not(term(N)), !, fail.
 alphaEq(mvar(V), mvar(W)) :- V = W.
 alphaEq(app(M, N), app(O, P)) :- alphaEq(M, O), alphaEq(N, P).
-alphaEq(lambda(mvar(V), M), lambda(mvar(V), N)) :- alphaEq(M, N).
-alphaEq(lambda(mvar(V), M), lambda(mvar(W), N)) :-
+alphaEq(lambda(V, M), lambda(V, N)) :- alphaEq(M, N).
+alphaEq(lambda(V, M), lambda(W, N)) :-
 	V \== W, fv(M, L), not(member(W, L)), sustFV(M, V, W, MSust),
 	alphaEq(MSust, N).
 
@@ -78,22 +78,22 @@ sust(mvar(V), V, N, N).
 sust(mvar(V), W, _, mvar(V)) :- V \== W.
 sust(app(M, N), V, O, app(MSust, NSust)) :-
 	sust(M, V, O, MSust), sust(N, V, O, NSust).
-sust(lambda(mvar(V), N), V, _, lambda(mvar(V), N)).
-sust(lambda(mvar(V), N), W, O, Res) :- W \== V,
+sust(lambda(V, N), V, _, lambda(V, N)).
+sust(lambda(V, N), W, O, Res) :- W \== V,
 	nonFV(N, O, Fresca),
 	sust(N, Fresca, mvar(V), NSust),
-	MSust = lambda(mvar(Fresca), NSust),
+	MSust = lambda(Fresca, NSust),
 	sust(MSust, W, O, Res).
 
 %Ej 6A: betaRedex(+R, ?N)
-betaRedex(app(lambda(mvar(V), M), N), Reduccion) :-
+betaRedex(app(lambda(V, M), N), Reduccion) :-
 	sust(M, V, N, Reduccion).
 
 %Ej 6B: reduce(+M, ?N)
 reduce(app(M, N), app(MRedu, N)) :- reduce(M, MRedu).
 reduce(app(M, N), app(M, NRedu)) :- reduce(N, NRedu).
-reduce(app(lambda(mvar(X), M), N), MSust) :- sust(M, X, N, MSust).
-reduce(lambda(mvar(V), M), lambda(mvar(V), MRedu)) :- reduce(M, MRedu).
+reduce(app(lambda(X, M), N), MSust) :- sust(M, X, N, MSust).
+reduce(lambda(V, M), lambda(V, MRedu)) :- reduce(M, MRedu).
 
 %Ej 7: formaNormal(+M)
 formaNormal(M) :- not(reduce(M, _)).
