@@ -101,8 +101,10 @@ reduce(lambda(mvar(V), M), lambda(mvar(V), MRedu)) :- reduce(M, MRedu).
 formaNormal(M) :- not(reduce(M, _)).
 
 %Ej 8: leftmost(+M, -N)
+leftmost(M, N) :- reduce(M, N), !.
 
 %Ej 9: formaNormal(+M, -N)
+
 
 %Ej 10A: long(+M, ?K)
 %Ej 10B: long(-M, +K)
