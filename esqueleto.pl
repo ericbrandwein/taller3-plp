@@ -34,7 +34,7 @@ vari(X) :- X = ^(Y), vari(Y).
 
 %Ej 1B: term(+M)
 term(mvar(V)) :- vari(V).
-term(app(M, N)) :- term(M), term(N).
+term(app(lambda(mvar(V), M), N)) :- vari(V), term(M), term(N).
 term(lambda(mvar(V), N)) :- vari(V), term(N).
 
 % No es posible definir term(-X), ya que unifica infinitamente
