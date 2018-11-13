@@ -103,8 +103,23 @@ formaNormal(M) :- not(reduce(M, _)).
 %Ej 8: leftmost(+M, -N)
 leftmost(M, N) :- reduce(M, N), !.
 
-%Ej 9: formaNormal(+M, -N)
+%Ej 9A: formaNormal(+M, -N)
+formaNormal(M, M) :- formaNormal(M).
+formaNormal(M, N) :-
+	not(formaNormal(M)), leftmost(M, X), formaNormal(X, N).
 
+%Ej 9B
+% ¿Podrá definirse formaNormal(+M, +N)?
+% Si, podrías aplicar leftmost/2 a M hasta llegar a su forma normal O,
+% y luego comparar a O con N con alphaEq/2.
+
+%¿O una versión de formaNormal(+M, -N) que sea total? ¿Por qué?
+% No se puede hacer total porque los candidatos de N son todos los
+% términos alfa equivalentes a la forma normal de M. Además de
+% estos términos ser infinitos, nunca se llega a generar el término
+% alfa equivalente en el que se sustituye la segunda variable ligada
+% en aparecer, ya que sustituyendo la primera ya se tienen infinitos
+% términos.
 
 %Ej 10A: long(+M, ?K)
 %Ej 10B: long(-M, +K)
