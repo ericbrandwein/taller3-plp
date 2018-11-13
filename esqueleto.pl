@@ -98,6 +98,7 @@ reduce(app(lambda(mvar(X), M), N), MSust) :- sust(M, X, N, MSust).
 reduce(lambda(mvar(V), M), lambda(mvar(V), MRedu)) :- reduce(M, MRedu).
 
 %Ej 7: formaNormal(+M)
+formaNormal(M) :- not(reduce(M, _)).
 
 %Ej 8: leftmost(+M, -N)
 
