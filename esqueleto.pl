@@ -45,20 +45,18 @@ term(lambda(mvar(V), N)) :- vari(V), term(N).
 % mvar(x), mvar(^(x)), etc. en vez de x, ^(x), ^(^(x)), etc.
 
 %Ej 2: fv(+M, -Xs)
-fv(M, _) :- not(term(M)), !, fail.
 fv(mvar(V), [V]).
 fv(app(M, N), Lista) :- fv(M, L1), fv(N, L2), union(L1, L2, Lista).
 fv(lambda(V, N), Lista) :- fv(V, L1), fv(N, L2), subtract(L2, L1, Lista).
 
 %Ej 3: sustFV(+M, +X, +Y, ?MSust)
 sustFV(mvar(V), V, Var2, mvar(Var2)).
-sustFV(mvar(V), Var1, _, MSust) :- V \= Var1, MSust = mvar(V).
-sustFV(app(O, N), Var1, Var2, MSust) :-
-	sustFV(O, Var1, Var2, OSust), sustFV(N, Var1, Var2, NSust),
-	MSust = app(OSust, NSust).
+sustFV(mvar(V), Var1, _, mvar(V)) :- V \= Var1.
+sustFV(app(O, N), Var1, Var2, app(OSust, NSust)) :-
+	sustFV(O, Var1, Var2, OSust), sustFV(N, Var1, Var2, NSust).
 sustFV(lambda(mvar(V), N), V, _, lambda(mvar(V), N)).
-sustFV(lambda(mvar(V), N), Var1, Var2, MSust) :-
-	V \= Var1, sustFV(N, Var1, Var2, NSust), MSust = lambda(mvar(V), NSust).
+sustFV(lambda(mvar(V), N), Var1, Var2, lambda(mvar(V), NSust)) :-
+	V \= Var1, sustFV(N, Var1, Var2, NSust).
 
 
 %Ej 4: alphaEq(+M, +N)
