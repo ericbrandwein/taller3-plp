@@ -62,6 +62,14 @@ sustFV(lambda(mvar(V), N), Var1, Var2, MSust) :-
 
 
 %Ej 4: alphaEq(+M, +N)
+alphaEq(M, _) :- not(term(M)), !, fail.
+alphaEq(_, N) :- not(term(N)), !, fail.
+alphaEq(mvar(V), mvar(W)) :- V = W.
+alphaEq(app(M, N), app(O, P)) :- alphaEq(M, O), alphaEq(N, P).
+alphaEq(lambda(mvar(V), M), lambda(mvar(V), N)) :- alphaEq(M, N).
+alphaEq(lambda(mvar(V), M), lambda(mvar(W), N)) :-
+	V \== W, fv(M, L), not(member(W, L)), sustFV(M, V, W, MSust),
+	alphaEq(MSust, N).
 
 %Ej 5: sust(+M, +X, +N, ?MSust)
 
